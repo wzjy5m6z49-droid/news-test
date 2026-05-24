@@ -7,6 +7,7 @@ const REFRESH_INTERVAL = 5000;
 const app = document.getElementById('newsV2');
 
 let currentKeys = new Set();
+let isRefreshing = false;
 
 function formatDate(value) {
   const d = new Date(value);
@@ -82,6 +83,8 @@ function createItemElement(item, index) {
 }
 
 function render(items) {
+  if (!Array.isArray(items)) return;
+
   app.innerHTML = '';
   currentKeys = new Set();
 
@@ -92,6 +95,9 @@ function render(items) {
 }
 
 function updateDiff(items) {
+  if (!Array.isArray(items)) return;
+  if (items.length === 0 && currentKeys.size > 0) return;
+
   const nextKeys = new Set(items.map(getItemKey));
 
   Array.from(app.querySelectorAll('.item')).forEach((el) => {
@@ -124,7 +130,9 @@ function loadNewsData() {
     script.src = `${NEWS_DATA_URL}?v=${Date.now()}`;
 
     script.onload = () => {
-      resolve(window.newsV2Data || []);
+      setTimeout(() => {
+        resolve(window.newsV2Data || []);
+      }, 50);
     };
 
     script.onerror = () => {
@@ -136,11 +144,21 @@ function loadNewsData() {
 }
 
 async function refreshNews() {
+  if (isRefreshing) return;
+
+  isRefreshing = true;
+
   try {
     const items = await loadNewsData();
+
+    if (!Array.isArray(items)) return;
+    if (items.length === 0 && currentKeys.size > 0) return;
+
     updateDiff(items);
   } catch (err) {
     console.error('[NewsV2] refresh error', err);
+  } finally {
+    isRefreshing = false;
   }
 }
 

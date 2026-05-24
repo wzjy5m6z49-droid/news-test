@@ -1,6 +1,12 @@
+const NEWS_DATA_URL =
+  'https://digitalgojp.sharepoint.com/sites/NTA_IBHub12/SiteAssets/news/news-data.js';
+
 const NEW_DAYS = 3;
+const REFRESH_INTERVAL = 5000;
 
 const app = document.getElementById('newsV2');
+
+let currentKeys = new Set();
 
 function formatDate(value) {
   const d = new Date(value);
@@ -37,46 +43,112 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
+function getItemKey(item) {
+  return item.sourceUrl || `${item.title}_${item.publicationDate}`;
+}
+
+function createItemElement(item, index) {
+  const date = item.publicationDate || item.created;
+  const important = item.important === true;
+  const newItem = isNew(date);
+
+  const a = document.createElement('a');
+  a.className = `item ${important ? 'importantItem' : ''}`;
+  a.href = item.sourceUrl || '#';
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  a.dataset.key = getItemKey(item);
+  a.style.animationDelay = `${index * 0.06}s`;
+
+  a.innerHTML = `
+    ${important ? '<span class="importantBar"></span>' : ''}
+
+    <div class="topRow">
+      <span class="date">${formatDate(date)}</span>
+      ${item.department ? `<span class="department">${escapeHtml(item.department)}</span>` : ''}
+      ${important ? '<span class="important">重要</span>' : ''}
+      ${
+        newItem
+          ? `<span class="newBadge" style="opacity:${getNewOpacity(date)}">NEW</span>`
+          : ''
+      }
+    </div>
+
+    <div class="title">${escapeHtml(item.title)}</div>
+    <div class="hoverLine"></div>
+  `;
+
+  return a;
+}
+
 function render(items) {
   app.innerHTML = '';
+  currentKeys = new Set();
 
   items.forEach((item, index) => {
-    const date = item.publicationDate || item.created;
-    const important = item.important === true;
-    const newItem = isNew(date);
-
-    const a = document.createElement('a');
-    a.className = `item ${important ? 'importantItem' : ''}`;
-    a.href = item.sourceUrl || '#';
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    a.style.animationDelay = `${index * 0.06}s`;
-
-    a.innerHTML = `
-      ${important ? '<span class="importantBar"></span>' : ''}
-
-      <div class="topRow">
-        <span class="date">${formatDate(date)}</span>
-        ${item.department ? `<span class="department">${escapeHtml(item.department)}</span>` : ''}
-        ${important ? '<span class="important">重要</span>' : ''}
-        ${
-          newItem
-            ? `<span class="newBadge" style="opacity:${getNewOpacity(date)}">NEW</span>`
-            : ''
-        }
-      </div>
-
-      <div class="title">${escapeHtml(item.title)}</div>
-      <div class="hoverLine"></div>
-    `;
-
-    app.appendChild(a);
+    currentKeys.add(getItemKey(item));
+    app.appendChild(createItemElement(item, index));
   });
+}
+
+function updateDiff(items) {
+  const nextKeys = new Set(items.map(getItemKey));
+
+  Array.from(app.querySelectorAll('.item')).forEach((el) => {
+    const key = el.dataset.key;
+    if (!nextKeys.has(key)) {
+      el.remove();
+    }
+  });
+
+  items.forEach((item, index) => {
+    const key = getItemKey(item);
+    const existing = app.querySelector(`.item[data-key="${CSS.escape(key)}"]`);
+
+    if (!existing) {
+      const el = createItemElement(item, index);
+      app.insertBefore(el, app.children[index] || null);
+    }
+  });
+
+  currentKeys = nextKeys;
+}
+
+function loadNewsData() {
+  return new Promise((resolve, reject) => {
+    const oldScript = document.getElementById('newsDataScript');
+    if (oldScript) oldScript.remove();
+
+    const script = document.createElement('script');
+    script.id = 'newsDataScript';
+    script.src = `${NEWS_DATA_URL}?v=${Date.now()}`;
+
+    script.onload = () => {
+      resolve(window.newsV2Data || []);
+    };
+
+    script.onerror = () => {
+      reject(new Error('news-data.js load failed'));
+    };
+
+    document.body.appendChild(script);
+  });
+}
+
+async function refreshNews() {
+  try {
+    const items = await loadNewsData();
+    updateDiff(items);
+  } catch (err) {
+    console.error('[NewsV2] refresh error', err);
+  }
 }
 
 try {
   const items = window.newsV2Data || [];
   render(items);
+
+  setInterval(refreshNews, REFRESH_INTERVAL);
 } catch (err) {
   console.error('[NewsV2] load error', err);
   app.innerHTML = '<div class="error">ニュースを読み込めませんでした</div>';

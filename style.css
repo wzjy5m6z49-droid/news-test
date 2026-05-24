@@ -2,24 +2,22 @@ html,
 body {
   margin: 0;
   padding: 0;
+  height: 100%;
+  overflow: hidden;
   background: transparent;
 }
 
-body {
-  font-family:
-    'Segoe UI',
-    'Helvetica Neue',
-    Arial,
-    sans-serif;
-}
-
 .newsV2 {
-  max-height: 520px;
+  height: 300px;
+  max-height: 300px;
   overflow-y: auto;
+  overflow-x: hidden;
+
   border-radius: 8px;
   transform: translateZ(0);
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
+
   scrollbar-width: none;
 }
 

@@ -1,0 +1,338 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+body {
+  font-family:
+    'Segoe UI',
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+}
+
+.newsV2 {
+  border-radius: 8px;
+  overflow: hidden;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ======================================================
+   アイテム
+====================================================== */
+
+.item {
+  position: relative;
+
+  padding: 14px 12px;
+  padding-left: 16px;
+
+  display: block;
+
+  text-decoration: none;
+  color: inherit;
+
+  border-radius: 6px;
+
+  overflow: hidden;
+  isolation: isolate;
+
+  opacity: 0;
+
+  transform:
+    translateY(18px);
+
+  animation:
+    fadeSlideUp 0.9s ease-out forwards;
+
+  transition:
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.35s ease;
+}
+
+/* hover背景 */
+.item::before {
+  content: '';
+
+  position: absolute;
+  inset: 0;
+
+  border-radius: 6px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent-color, #0078d4) 8%,
+      transparent
+    );
+
+  transform: scaleX(0);
+  transform-origin: right center;
+
+  transition:
+    transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+
+  z-index: 0;
+}
+
+/* hover時 */
+.item:hover::before {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* 重要だけ赤寄り */
+.importantItem:hover::before {
+  background:
+    color-mix(
+      in srgb,
+      #d13438 12%,
+      transparent
+    );
+}
+
+/* 押下感 */
+.item:active {
+  transform:
+    translateY(0)
+    scale(0.985);
+}
+
+/* ======================================================
+   表示アニメ
+====================================================== */
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform:
+      translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateY(0);
+  }
+}
+
+/* ======================================================
+   上段
+====================================================== */
+
+.topRow {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.date {
+  font-size: 14px;
+  color:
+    var(--accent-color, #0078d4);
+}
+
+.department {
+  font-size: 13px;
+  color: #666;
+}
+
+/* ======================================================
+   重要
+====================================================== */
+
+@keyframes importantBreath {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.68;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes pulseBar {
+  0% {
+    box-shadow:
+      0 0 6px rgba(209, 52, 56, 0.16);
+  }
+
+  50% {
+    box-shadow:
+      0 0 14px rgba(209, 52, 56, 0.34);
+  }
+
+  100% {
+    box-shadow:
+      0 0 6px rgba(209, 52, 56, 0.16);
+  }
+}
+
+.importantBar {
+  position: absolute;
+
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+
+  width: 4px;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ff8c8c,
+      #d13438 45%,
+      #b42318
+    );
+
+  animation:
+    importantBreath 2.2s ease-in-out infinite,
+    pulseBar 2.8s ease-in-out infinite;
+
+  z-index: 2;
+}
+
+.important {
+  color: #d13438;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  animation:
+    importantBreath 2s ease-in-out infinite;
+}
+
+/* ======================================================
+   NEW
+====================================================== */
+
+.newBadge {
+  color:
+    var(--new-color, #ff9800);
+
+  font-size: 12px;
+  font-weight: 700;
+
+  transition:
+    transform 0.35s ease,
+    opacity 0.35s ease;
+}
+
+.item:hover .newBadge {
+  transform:
+    translateY(-1px);
+}
+
+/* ======================================================
+   タイトル
+====================================================== */
+
+.title {
+  position: relative;
+  z-index: 2;
+
+  margin-top: 4px;
+
+  font-size: 18px;
+  font-weight: 500;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  transition:
+    color 0.42s ease,
+    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.item:hover .title {
+  color:
+    var(--accent-color, #0078d4);
+
+  transform:
+    translateX(2px);
+}
+
+/* ======================================================
+   hover line
+====================================================== */
+
+.hoverLine {
+  position: absolute;
+
+  left: 8px;
+  right: 8px;
+  bottom: 0;
+
+  height: 2px;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(
+        in srgb,
+        var(--accent-color, #0078d4) 72%,
+        white
+      ),
+      var(--accent-color, #0078d4) 35%,
+      color-mix(
+        in srgb,
+        var(--accent-color, #0078d4) 82%,
+        black
+      ) 65%,
+      var(--accent-color, #0078d4)
+    );
+
+  background-size: 220% 100%;
+
+  transform: scaleX(0);
+  transform-origin: right center;
+
+  transition:
+    transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+
+  z-index: 2;
+}
+
+@keyframes gradientFlow {
+  from {
+    background-position: 0% 50%;
+  }
+
+  to {
+    background-position: 200% 50%;
+  }
+}
+
+.item:hover .hoverLine {
+  transform: scaleX(1);
+  transform-origin: left center;
+
+  animation:
+    gradientFlow 3.6s linear infinite;
+}
+
+/* ======================================================
+   error
+====================================================== */
+
+.error {
+  padding: 16px;
+  color: #d13438;
+}

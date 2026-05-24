@@ -9,6 +9,20 @@
 <body>
   <div id="newsV2" class="newsV2"></div>
 
-  <script src="./app.js"></script>
+  <script>
+    const script = document.createElement('script');
+
+    script.src =
+      'https://digitalgojp.sharepoint.com/sites/NTA_IBHub12/SiteAssets/news/news-data.js?v='
+      + new Date().getTime();
+
+    script.onload = () => {
+      const appScript = document.createElement('script');
+      appScript.src = './app.js';
+      document.body.appendChild(appScript);
+    };
+
+    document.body.appendChild(script);
+  </script>
 </body>
 </html>

@@ -32,7 +32,7 @@ body {
 .item {
   position: relative;
 
-  padding: 14px 12px;
+  padding: 9px 12px;
   padding-left: 16px;
 
   display: block;
@@ -249,9 +249,9 @@ body {
   position: relative;
   z-index: 2;
 
-  margin-top: 4px;
+  margin-top: 2px;
 
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 500;
 
   overflow: hidden;

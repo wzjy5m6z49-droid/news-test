@@ -14,11 +14,17 @@ body {
 }
 
 .newsV2 {
+  max-height: 520px;
+  overflow-y: auto;
   border-radius: 8px;
-  overflow: hidden;
   transform: translateZ(0);
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
+  scrollbar-width: none;
+}
+
+.newsV2::-webkit-scrollbar {
+  display: none;
 }
 
 /* ======================================================

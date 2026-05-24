@@ -1,6 +1,3 @@
-const DATA_URL =
-  'https://digitalgojp.sharepoint.com/sites/NTA_IBHub12/SiteAssets/news/news-data.json';
-
 const NEW_DAYS = 3;
 
 const app = document.getElementById('newsV2');
@@ -40,21 +37,6 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
-async function loadNews() {
-  const url = `${DATA_URL}?v=${Date.now()}`;
-
-  const res = await fetch(url, {
-    cache: 'no-store',
-    credentials: 'include'
-  });
-
-  if (!res.ok) {
-    throw new Error(`HTTP ${res.status}`);
-  }
-
-  return await res.json();
-}
-
 function render(items) {
   app.innerHTML = '';
 
@@ -92,9 +74,10 @@ function render(items) {
   });
 }
 
-loadNews()
-  .then(render)
-  .catch((err) => {
-    console.error('[NewsV2] load error', err);
-    app.innerHTML = '<div class="error">ニュースを読み込めませんでした</div>';
-  });
+try {
+  const items = window.newsV2Data || [];
+  render(items);
+} catch (err) {
+  console.error('[NewsV2] load error', err);
+  app.innerHTML = '<div class="error">ニュースを読み込めませんでした</div>';
+}

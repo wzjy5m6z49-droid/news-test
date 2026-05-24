@@ -4,10 +4,15 @@ const NEWS_DATA_URL =
 const NEW_DAYS = 3;
 const REFRESH_INTERVAL = 5000;
 
+const AUTO_SCROLL_SPEED = 0.35;
+const AUTO_SCROLL_INTERVAL = 16;
+
 const app = document.getElementById('newsV2');
 
 let currentKeys = new Set();
 let isRefreshing = false;
+let autoScrollTimer = null;
+let autoScrollDirection = 1;
 
 function formatDate(value) {
   const d = new Date(value);
@@ -92,6 +97,8 @@ function render(items) {
     currentKeys.add(getItemKey(item));
     app.appendChild(createItemElement(item, index));
   });
+
+  startAutoScroll();
 }
 
 function updateDiff(items) {
@@ -160,6 +167,27 @@ async function refreshNews() {
   } finally {
     isRefreshing = false;
   }
+}
+
+function startAutoScroll() {
+  if (!app) return;
+  if (autoScrollTimer) return;
+
+  autoScrollTimer = setInterval(() => {
+    const maxScrollTop = app.scrollHeight - app.clientHeight;
+
+    if (maxScrollTop <= 0) return;
+
+    if (app.scrollTop >= maxScrollTop) {
+      autoScrollDirection = -1;
+    }
+
+    if (app.scrollTop <= 0) {
+      autoScrollDirection = 1;
+    }
+
+    app.scrollTop += autoScrollDirection * AUTO_SCROLL_SPEED;
+  }, AUTO_SCROLL_INTERVAL);
 }
 
 try {
